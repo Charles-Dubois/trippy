@@ -39,6 +39,18 @@ router.get("/:id", handleRestaurantById, (req, res) => {
 });
 
 router.post("/", checkAddRestaurant, (req, res) => {
-  res.status(201).json({ message: "restaurant added", description: req.body });
+  const addData = {
+    id: data.length + 1,
+    name: req.body.name,
+    address: req.body.address,
+    city: req.body.city,
+    country: req.body.country,
+    cuisine: req.body.cuisine,
+    stars: req.body.stars,
+    priceCategory: req.body.priceCategory,
+  };
+
+  data.push(addData);
+  res.status(201).json({ message: "restaurant added", description: addData });
 });
 module.exports = router;

@@ -42,7 +42,20 @@ router.get("/:id", handleHotelById, (req, res) => {
 });
 
 router.post("/", checkAddHotel, (req, res) => {
-  res.status(201).json({ message: "Hotel added", description: req.body });
+  const addData = {
+    id: data.length + 1,
+    name: req.body.name,
+    address: req.body.address,
+    city: req.body.city,
+    country: req.body.country,
+    hasSpa: req.body.hasSpa,
+    hasPool: req.body.hasPool,
+    stars: req.body.stars,
+    priceCategory: req.body.priceCategory,
+  };
+
+  data.push(addData);
+  res.status(201).json({ message: "Hotel added", description: addData });
 });
 // router.patch("/:id", (req, res) => {});
 module.exports = router;
