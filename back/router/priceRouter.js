@@ -2,6 +2,7 @@ const dataHotels = require("../hotels.json");
 const dataRestaurants = require("../restaurants.json");
 const express = require("express");
 const router = express.Router();
+
 const infos =
   "select a price category between 1 and 3 and choose between restaurants or hotels like this example \n 1/restaurants\n 2/hotels ";
 router.get("/", (_req, res) => {

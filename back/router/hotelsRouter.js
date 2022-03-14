@@ -4,7 +4,7 @@ const Joi = require("joi");
 const addHotel = require("./JoiConditions/addHotel");
 const patchName = require("./JoiConditions/patchName");
 const router = express.Router();
-
+const spaPoolRouter = require("./spaPoolRouter");
 let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
   "This value will change each time the user seach a restaurant by ID";
@@ -46,7 +46,7 @@ function checkPatchName(req, res, next) {
   }
   next();
 }
-
+router.use("/spaPool", spaPoolRouter);
 router.get("/", (_req, res) => {
   res.json(data);
 });
