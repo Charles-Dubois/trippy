@@ -29,6 +29,7 @@ router.get("/:country/:type", (req, res) => {
       help: infos,
     });
   }
+
   res.json(filterCountry);
 });
 

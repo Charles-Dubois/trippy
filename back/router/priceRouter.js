@@ -13,7 +13,7 @@ router.get("/:price/:type", (req, res) => {
   const type = req.params.type;
   let data =
     "this value will change whith the type of the researsch of the user";
-  switch (type) {
+  switch (type.toLowerCase()) {
     case "restaurants":
       data = dataRestaurants;
       break;

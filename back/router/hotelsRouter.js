@@ -46,9 +46,20 @@ function checkPatchName(req, res, next) {
   }
   next();
 }
-router.use("/spaPool", spaPoolRouter);
-router.get("/", (_req, res) => {
-  res.json(data);
+
+// router.use("/spaPool", spaPoolRouter);
+router.get("/", (req, res) => {
+  currentData = "this value will change with the query params";
+  if (req.query.country) {
+    currentData = data.filter(
+      (element) =>
+        element.country.toLowerCase() === req.query.country.toLowerCase()
+      // ici il faut continuer, faire un guard pour éviter un crash si le pays entré n'est pas valide
+    );
+  }
+
+  console.log(req.query);
+  res.json(currentData);
 });
 
 router.get("/:id", handleHotelById, (req, res) => {

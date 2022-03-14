@@ -8,14 +8,14 @@ const app = express();
 app.use(express.json());
 app.get("/", (_req, res) => {
   res.send(
-    "use the endpoint /hotels with method GET to show all hotels \n use the endpoint /hotels/:id with the method GET to see the hotel wich corresponds \n use the endpoint /hotels with method POST to add hotel \n use the endpoint /hotels/:id with the method DELETE to remove the hotel wich corresponds \n use the endpoint /hotels/:id with the method PATCH to change the hotel name \n \n use the endpoint /restaurants with method GET to show all restaurants \n use the endpoint /restaurants/:id with the method GET to see the restaurant wich corresponds \n use the endpoint /restautants with method POST to add restaurants \n use the endpoint /restaurants/:id with the method DELETE to remove the restaurant wich corresponds \n use the endpoint /restaurants/:id with the method PATCH to change the restaurant name  \n \n"
+    "use the endpoint /hotels with method GET to show all hotels \n use the endpoint /hotels/:id with the method GET to see the hotel wich corresponds \n use the endpoint /hotels with method POST to add hotel \n use the endpoint /hotels/:id with the method DELETE to remove the hotel wich corresponds \n use the endpoint /hotels/:id with the method PATCH to change the hotel name \n \n use the endpoint /restaurants with method GET to show all restaurants \n use the endpoint /restaurants/:id with the method GET to see the restaurant wich corresponds \n use the endpoint /restautants with method POST to add restaurants \n use the endpoint /restaurants/:id with the method DELETE to remove the restaurant wich corresponds \n use the endpoint /restaurants/:id with the method PATCH to change the restaurant name  \n \n use the endpoint /hotels/spaPool with GET method to see more information on\n use the endpoint /price with GET method to show more information\nuse the endpoint /country with GET method to show more information"
   );
 });
 
 app.use("/hotels", hotelsRouter);
 app.use("/restaurants", restaurantsRouter);
-app.use("/country", countryRouter);
-app.use("/price", priceRouter);
+// app.use("/country", countryRouter);
+// app.use("/price", priceRouter);
 app.get("*", (_req, res) => {
   res.status(404).send("error 404");
 });
