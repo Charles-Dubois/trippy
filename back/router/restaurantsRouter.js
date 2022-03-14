@@ -1,8 +1,10 @@
 const data = require("../restaurants.json");
 const express = require("express");
 const router = express.Router();
-
-let restaurantById = "";
+const Joi = require("joi");
+const addRestaurant = require("./JoiConditions/addRestaurant");
+let restaurantById =
+  "This value will change each time the user seach a restaurant by ID";
 function handleRestaurantById(req, res, next) {
   checkId = data.find((restaurant) => {
     return restaurant.id.toString() === req.params.id.toString();
@@ -18,10 +20,25 @@ function handleRestaurantById(req, res, next) {
   next();
 }
 
+function checkAddRestaurant(req, res, next) {
+  const validation = addRestaurant.validate(req.body);
+  if (validation.error) {
+    return res.status(400).json({
+      message: "error 400 bad request",
+      description: validation.error.details[0].message,
+    });
+  }
+  next();
+}
+
 router.get("/", (_req, res) => {
   res.json(data);
 });
 router.get("/:id", handleRestaurantById, (req, res) => {
-  res.json(restaurantById);
+  res.json({ restaurantById });
+});
+
+router.post("/", checkAddRestaurant, (req, res) => {
+  res.status(201).json({ message: "restaurant added", description: req.body });
 });
 module.exports = router;
