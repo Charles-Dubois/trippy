@@ -4,6 +4,7 @@ const router = express.Router();
 const Joi = require("joi");
 const patchName = require("./JoiConditions/patchName");
 const addRestaurant = require("./JoiConditions/addRestaurant");
+
 let indexRestaurant =
   "this value correspond to the index of the restaurant selected";
 let restaurantById =

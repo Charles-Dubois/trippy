@@ -4,6 +4,7 @@ const Joi = require("joi");
 const addHotel = require("./JoiConditions/addHotel");
 const patchName = require("./JoiConditions/patchName");
 const router = express.Router();
+
 let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
   "This value will change each time the user seach a restaurant by ID";
@@ -81,4 +82,5 @@ router.delete("/:id", handleHotelById, (_req, res) => {
 
   res.json(data);
 });
+
 module.exports = router;
