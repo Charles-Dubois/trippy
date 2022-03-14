@@ -2,11 +2,16 @@ const data = require("../restaurants.json");
 const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
+const patchName = require("./JoiConditions/patchName");
 const addRestaurant = require("./JoiConditions/addRestaurant");
+let indexRestaurant =
+  "this value correspond to the index of the restaurant selected";
 let restaurantById =
   "This value will change each time the user seach a restaurant by ID";
+//middleware who return the element which correspond to the params
 function handleRestaurantById(req, res, next) {
-  checkId = data.find((restaurant) => {
+  checkId = data.find((restaurant, index) => {
+    indexRestaurant = index;
     return restaurant.id.toString() === req.params.id.toString();
   });
 
@@ -19,9 +24,20 @@ function handleRestaurantById(req, res, next) {
   restaurantById = checkId;
   next();
 }
-
+// middleware method POST with checking Joi condition
 function checkAddRestaurant(req, res, next) {
   const validation = addRestaurant.validate(req.body);
+  if (validation.error) {
+    return res.status(400).json({
+      message: "error 400 bad request",
+      description: validation.error.details[0].message,
+    });
+  }
+  next();
+}
+// middleware method PATCH with checking Joi condition
+function checkPatchName(req, res, next) {
+  const validation = patchName.validate(req.body);
   if (validation.error) {
     return res.status(400).json({
       message: "error 400 bad request",
@@ -54,8 +70,13 @@ router.post("/", checkAddRestaurant, (req, res) => {
   res.status(201).json({ message: "restaurant added", description: addData });
 });
 
-router.patch("/:id", handleRestaurantById, (req, res) => {
+router.patch("/:id", handleRestaurantById, checkPatchName, (req, res) => {
   restaurantById.name = req.body.name;
   res.json({ message: "name changed", description: restaurantById });
+});
+router.delete("/:id", handleRestaurantById, (_req, res) => {
+  data.splice(indexRestaurant, 1);
+
+  res.json(data);
 });
 module.exports = router;

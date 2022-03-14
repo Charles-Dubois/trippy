@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const addHotel = Joi.object({
-  name: Joi.string().alphanum().min(3).max(30).required(),
+  name: Joi.string().min(3).max(30).required(),
   address: Joi.string().min(3).max(50).required(),
   city: Joi.string().alphanum().min(3).max(20).required(),
   country: Joi.string().min(3).max(20).required(),

@@ -2,13 +2,15 @@ const data = require("../hotels.json");
 const express = require("express");
 const Joi = require("joi");
 const addHotel = require("./JoiConditions/addHotel");
+const patchName = require("./JoiConditions/patchName");
 const router = express.Router();
-
+let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
   "This value will change each time the user seach a restaurant by ID";
-//middleware method GET by ID
+//middleware who return the element which correspond to the params
 function handleHotelById(req, res, next) {
-  checkId = data.find((hotel) => {
+  checkId = data.find((hotel, index) => {
+    indexHotel = index;
     return hotel.id.toString() === req.params.id.toString();
   });
 
@@ -21,9 +23,20 @@ function handleHotelById(req, res, next) {
   hotelById = checkId;
   next();
 }
-// middleware method POST
+// middleware method POST with checking Joi condition
 function checkAddHotel(req, res, next) {
   const validation = addHotel.validate(req.body);
+  if (validation.error) {
+    return res.status(400).json({
+      message: "error 400 bad request",
+      description: validation.error.details[0].message,
+    });
+  }
+  next();
+}
+// middleware method PATCH with checking Joi condition
+function checkPatchName(req, res, next) {
+  const validation = patchName.validate(req.body);
   if (validation.error) {
     return res.status(400).json({
       message: "error 400 bad request",
@@ -58,8 +71,14 @@ router.post("/", checkAddHotel, (req, res) => {
   res.status(201).json({ message: "Hotel added", description: addData });
 });
 
-router.patch("/:id", handleHotelById, (req, res) => {
+router.patch("/:id", handleHotelById, checkPatchName, (req, res) => {
   hotelById.name = req.body.name;
   res.json({ message: "name changed", description: hotelById });
+});
+
+router.delete("/:id", handleHotelById, (_req, res) => {
+  data.splice(indexHotel, 1);
+
+  res.json(data);
 });
 module.exports = router;
