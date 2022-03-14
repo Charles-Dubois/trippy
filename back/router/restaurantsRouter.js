@@ -53,4 +53,9 @@ router.post("/", checkAddRestaurant, (req, res) => {
   data.push(addData);
   res.status(201).json({ message: "restaurant added", description: addData });
 });
+
+router.patch("/:id", handleRestaurantById, (req, res) => {
+  restaurantById.name = req.body.name;
+  res.json({ message: "name changed", description: restaurantById });
+});
 module.exports = router;
