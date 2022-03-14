@@ -24,7 +24,10 @@ router.get("/:country/:type", (req, res) => {
     (element) => element.country.toLowerCase() === country.toLowerCase()
   );
   if (filterCountry.length < 1) {
-    return res.send(`Any ${type} in ${country} are repertoried`);
+    return res.json({
+      error: `Any ${type} in ${country} are repertoried`,
+      help: infos,
+    });
   }
   res.json(filterCountry);
 });
