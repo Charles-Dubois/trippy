@@ -48,10 +48,17 @@ function checkPatchName(req, res, next) {
   next();
 }
 
-router.get("/", (_req, res) => {
-  res.json(data);
+router.get("/", (req, res) => {
+  currentData = "this value will change with the query params";
+  if (req.query.country) {
+    currentData = data.filter(
+      (element) =>
+        element.country.toLowerCase() === req.query.country.toLowerCase()
+    );
+  }
+  res.json(currentData);
 });
-router.get("/:id", handleRestaurantById, (req, res) => {
+router.get("/:id", handleRestaurantById, (_req, res) => {
   res.json({ restaurantById });
 });
 
