@@ -78,8 +78,6 @@ router.get("/", (req, res) => {
   for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
     let currentLoop = queryParams[queryLoop];
     if (req.query[currentLoop]) {
-      let actualQuery = req.query[currentLoop];
-
       queryData = queryData.filter(
         (element) =>
           element[currentLoop].toString().toLowerCase() ===

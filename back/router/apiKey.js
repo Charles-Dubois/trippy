@@ -22,4 +22,3 @@ router.get("/", (req, res) => {
   res.send("Add query params username to show the API key which corresponds");
 });
 module.exports = router;
-// GET /api-key?username=marie

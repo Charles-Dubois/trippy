@@ -64,7 +64,7 @@ const rateLimiterMiddleware = (req, res, next) => {
 
 app.get("/", checkAPIKey, (_req, res) => {
   res.send(
-    "use the endpoint /hotels with method GET to show all hotels \n use the endpoint /hotels/:id with the method GET to see the hotel wich corresponds \n use the endpoint /hotels with method POST to add hotel \n use the endpoint /hotels/:id with the method DELETE to remove the hotel wich corresponds \n use the endpoint /hotels/:id with the method PATCH to change the hotel name \n \n use the endpoint /restaurants with method GET to show all restaurants \n use the endpoint /restaurants/:id with the method GET to see the restaurant wich corresponds \n use the endpoint /restautants with method POST to add restaurants \n use the endpoint /restaurants/:id with the method DELETE to remove the restaurant wich corresponds \n use the endpoint /restaurants/:id with the method PATCH to change the restaurant name  \n \n use the endpoint /premium with POST method to generete a new key api \n use the endpoint /api-key with GET method to show your key api "
+    "use the endpoint /hotels with method GET to show all hotels \n\n use the endpoint /hotels/:id with the method GET to see the hotel which corresponds to the id\n example : 'http://localhost:8000/hotels/2' \n\n use the endpoint /hotels with method POST to add hotel in the list, you have to send json \n\n use the endpoint /hotels/:id with the method DELETE to remove the hotel wich corresponds to this id\n example : /hotels/2 \n\n use the endpoint /hotels/:id with the method PATCH to change the hotel name \n\n\n replace hotels by restaurants to do the same things whith the restaurants\nexapmle : 'http://localhost:8000/restaurants/' \n\n\n\n use the endpoint /premium with POST method to generete a new key api, you have to send json \n\n use the endpoint /api-key with GET method to show your key api you have to put in query params your username\nexample : 'http://localhost:8000/api-key/?username=michel'"
   );
 });
 app.use("/hotels", checkAPIKey, rateLimiterMiddleware, hotelsRouter);
@@ -77,7 +77,3 @@ app.get("*", (_req, res) => {
 app.listen(8000, () => {
   console.log("listening on port 8000");
 });
-
-// Enfin, ajoutez une route GET /api-key?username=marie qui permettra à un client de récupérer sa clé api à
-//  l’aide de son nom d’utilisateur, afin de pouvoir commencer à faire des
-//  requêtes (cela ressemble à un système de login).

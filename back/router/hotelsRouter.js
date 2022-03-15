@@ -7,11 +7,10 @@ const patchName = require("./JoiConditions/patchName");
 const postComment = require("./JoiConditions/postComment");
 const router = express.Router();
 
-const { query } = require("express");
 let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
   "This value will change each time the user seach a restaurant by ID";
-//middleware who return the element which correspond to the params
+//middleware which return the element which correspond to the params
 function handleHotelById(req, res, next) {
   checkId = data.find((hotel, index) => {
     indexHotel = index;
@@ -76,8 +75,6 @@ router.get("/", (req, res) => {
   for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
     let currentLoop = queryParams[queryLoop];
     if (req.query[currentLoop]) {
-      let actualQuery = req.query[currentLoop];
-
       queryData = queryData.filter(
         (element) =>
           element[currentLoop].toString().toLowerCase() ===
