@@ -5,6 +5,7 @@ const addHotel = require("./JoiConditions/addHotel");
 const patchName = require("./JoiConditions/patchName");
 const router = express.Router();
 const spaPoolRouter = require("./spaPoolRouter");
+const { query } = require("express");
 let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
   "This value will change each time the user seach a restaurant by ID";
@@ -49,17 +50,33 @@ function checkPatchName(req, res, next) {
 
 // router.use("/spaPool", spaPoolRouter);
 router.get("/", (req, res) => {
-  currentData = "this value will change with the query params";
-  if (req.query.country) {
-    currentData = data.filter(
-      (element) =>
-        element.country.toLowerCase() === req.query.country.toLowerCase()
-      // ici il faut continuer, faire un guard pour éviter un crash si le pays entré n'est pas valide
-    );
-  }
+  let queryData = data;
+  const queryParams = [
+    "country",
+    "priceCategory",
+    "name",
+    "address",
+    "city",
+    "stars",
+    "hasSpa",
+    "hasPool",
+    "priceCategory",
+  ];
+  for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
+    let currentLoop = queryParams[queryLoop];
+    if (req.query[currentLoop]) {
+      let actualQuery = req.query[currentLoop];
+      console.log(actualQuery);
+      console.log(currentLoop);
 
-  console.log(req.query);
-  res.json(currentData);
+      queryData = queryData.filter(
+        (element) =>
+          element[currentLoop].toString().toLowerCase() ===
+          req.query[currentLoop].toString().toLowerCase()
+      );
+    }
+  }
+  res.json(queryData);
 });
 
 router.get("/:id", handleHotelById, (req, res) => {
@@ -68,7 +85,7 @@ router.get("/:id", handleHotelById, (req, res) => {
 
 router.post("/", checkAddHotel, (req, res) => {
   const addData = {
-    id: data.length + 1,
+    id: data[data.length - 1].id + 1,
     name: req.body.name,
     address: req.body.address,
     city: req.body.city,

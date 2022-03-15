@@ -49,14 +49,33 @@ function checkPatchName(req, res, next) {
 }
 
 router.get("/", (req, res) => {
-  currentData = "this value will change with the query params";
-  if (req.query.country) {
-    currentData = data.filter(
-      (element) =>
-        element.country.toLowerCase() === req.query.country.toLowerCase()
-    );
+  let queryData = data;
+
+  const queryParams = [
+    "country",
+    "priceCategory",
+    "name",
+    "address",
+    "city",
+    "stars",
+    "cuisine",
+    "priceCategory",
+  ];
+  for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
+    let currentLoop = queryParams[queryLoop];
+    if (req.query[currentLoop]) {
+      let actualQuery = req.query[currentLoop];
+      console.log(actualQuery);
+      console.log(currentLoop);
+
+      queryData = queryData.filter(
+        (element) =>
+          element[currentLoop].toString().toLowerCase() ===
+          req.query[currentLoop].toString().toLowerCase()
+      );
+    }
   }
-  res.json(currentData);
+  res.json(queryData);
 });
 router.get("/:id", handleRestaurantById, (_req, res) => {
   res.json({ restaurantById });
@@ -64,7 +83,7 @@ router.get("/:id", handleRestaurantById, (_req, res) => {
 
 router.post("/", checkAddRestaurant, (req, res) => {
   const addData = {
-    id: data.length + 1,
+    id: data[data.length - 1].id + 1,
     name: req.body.name,
     address: req.body.address,
     city: req.body.city,
