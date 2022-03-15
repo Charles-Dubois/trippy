@@ -65,8 +65,6 @@ router.get("/", (req, res) => {
     let currentLoop = queryParams[queryLoop];
     if (req.query[currentLoop]) {
       let actualQuery = req.query[currentLoop];
-      console.log(actualQuery);
-      console.log(currentLoop);
 
       queryData = queryData.filter(
         (element) =>

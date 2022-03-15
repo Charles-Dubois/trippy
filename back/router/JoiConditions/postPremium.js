@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const patchName = Joi.object({
+const postPremium = Joi.object({
   username: Joi.string().min(3).max(30).required(),
 });
-module.exports = patchName;
+module.exports = postPremium;
