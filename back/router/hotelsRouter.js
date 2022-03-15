@@ -4,7 +4,7 @@ const Joi = require("joi");
 const addHotel = require("./JoiConditions/addHotel");
 const patchName = require("./JoiConditions/patchName");
 const router = express.Router();
-const spaPoolRouter = require("./spaPoolRouter");
+
 const { query } = require("express");
 let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
@@ -48,7 +48,6 @@ function checkPatchName(req, res, next) {
   next();
 }
 
-// router.use("/spaPool", spaPoolRouter);
 router.get("/", (req, res) => {
   let queryData = data;
   const queryParams = [
