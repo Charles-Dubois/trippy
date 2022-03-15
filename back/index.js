@@ -8,11 +8,16 @@ const app = express();
 app.use(express.json());
 
 const rateLimiter = new RateLimiterMemory({
-  points: 100,
+  points: 10,
+  duration: 60,
+});
+const rateLimiterPremium = new RateLimiterMemory({
+  points: 20,
   duration: 60,
 });
 let loggedIn = false;
 function checkAPIKey(req, res, next) {
+  loggedIn = false;
   let validation = "default value";
   if (APIKey.length < 1 && req.query.api_key) {
     return res.status(400).json({
@@ -30,25 +35,34 @@ function checkAPIKey(req, res, next) {
         description: "this APi key is not valid",
       });
     }
+    loggedIn = true;
+
     console.log(validation.api_key);
   }
-  // TODO continuer ici : faire en sorte que quand la clé api correspond a une clé déjà entrée le nombre de requete possbile augment
 
   next();
 }
 
 const rateLimiterMiddleware = (req, res, next) => {
-  rateLimiter
+  const checkPremium = () => {
+    if (loggedIn) {
+      return rateLimiterPremium;
+    } else {
+      return rateLimiter;
+    }
+  };
+  checkPremium()
     .consume()
     .then(() => {
       next();
     })
     .catch(() => {
-      res.status(429).send("Requests limited to 100 per hour");
+      res.status(429).send("Too many requests");
     });
 };
 
 app.get("/", checkAPIKey, rateLimiterMiddleware, (_req, res) => {
+  console.log(loggedIn);
   res.send(
     "use the endpoint /hotels with method GET to show all hotels \n use the endpoint /hotels/:id with the method GET to see the hotel wich corresponds \n use the endpoint /hotels with method POST to add hotel \n use the endpoint /hotels/:id with the method DELETE to remove the hotel wich corresponds \n use the endpoint /hotels/:id with the method PATCH to change the hotel name \n \n use the endpoint /restaurants with method GET to show all restaurants \n use the endpoint /restaurants/:id with the method GET to see the restaurant wich corresponds \n use the endpoint /restautants with method POST to add restaurants \n use the endpoint /restaurants/:id with the method DELETE to remove the restaurant wich corresponds \n use the endpoint /restaurants/:id with the method PATCH to change the restaurant name  \n  "
   );
