@@ -120,11 +120,25 @@ router.delete("/:id", handleRestaurantById, (_req, res) => {
 });
 //*comments path
 
-router.get("/:id/comments/", handleRestaurantById, (_req, res) => {
+router.get("/:id/comments/", handleRestaurantById, (req, res) => {
   const comments = restaurantById.comments;
+  let currentComments = [];
+  const limit = parseInt(req.query.limit);
+
+  if (limit) {
+    for (let i = limit - 1; i >= 0; i--) {
+      if (comments[i]) {
+        currentComments.push(comments[i]);
+      }
+    }
+  }
   if (comments.length < 1) {
     return res.send("Any comments addeds");
   }
+  if (currentComments.length > 0) {
+    return res.json(currentComments);
+  }
+
   res.json(comments);
 });
 router.post(

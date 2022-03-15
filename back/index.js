@@ -13,6 +13,7 @@ const rateLimiter = new RateLimiterMemory({
   points: 10,
   duration: 60,
 });
+
 const rateLimiterPremium = new RateLimiterMemory({
   points: 20,
   duration: 60,

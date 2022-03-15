@@ -121,11 +121,25 @@ router.delete("/:id", handleHotelById, (_req, res) => {
 });
 //*comments path
 
-router.get("/:id/comments/", handleHotelById, (_req, res) => {
+router.get("/:id/comments/", handleHotelById, (req, res) => {
   const comments = hotelById.comments;
+  let currentComments = [];
+  const limit = parseInt(req.query.limit);
+
+  if (limit) {
+    for (let i = limit - 1; i >= 0; i--) {
+      if (comments[i]) {
+        currentComments.push(comments[i]);
+      }
+    }
+  }
   if (comments.length < 1) {
     return res.send("Any comments addeds");
   }
+  if (currentComments.length > 0) {
+    return res.json(currentComments);
+  }
+
   res.json(comments);
 });
 router.post("/:id/comments/", handleHotelById, checkPostComment, (req, res) => {
