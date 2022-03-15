@@ -1,8 +1,10 @@
 const data = require("../hotels.json");
 const express = require("express");
 const Joi = require("joi");
+const { v4: uuidv4 } = require("uuid");
 const addHotel = require("./JoiConditions/addHotel");
 const patchName = require("./JoiConditions/patchName");
+const postComment = require("./JoiConditions/postComment");
 const router = express.Router();
 
 const { query } = require("express");
@@ -39,6 +41,16 @@ function checkAddHotel(req, res, next) {
 // middleware method PATCH with checking Joi condition
 function checkPatchName(req, res, next) {
   const validation = patchName.validate(req.body);
+  if (validation.error) {
+    return res.status(400).json({
+      message: "error 400 bad request",
+      description: validation.error.details[0].message,
+    });
+  }
+  next();
+}
+function checkPostComment(req, res, next) {
+  const validation = postComment.validate(req.body);
   if (validation.error) {
     return res.status(400).json({
       message: "error 400 bad request",
@@ -106,6 +118,40 @@ router.delete("/:id", handleHotelById, (_req, res) => {
   data.splice(indexHotel, 1);
 
   res.json(data);
+});
+//*comments path
+
+router.get("/:id/comments/", handleHotelById, (_req, res) => {
+  const comments = hotelById.comments;
+  if (comments.length < 1) {
+    return res.send("Any comments addeds");
+  }
+  res.json(comments);
+});
+router.post("/:id/comments/", handleHotelById, checkPostComment, (req, res) => {
+  const comment = {
+    id: uuidv4(),
+    username: req.body.username,
+    text: req.body.text,
+  };
+
+  hotelById.comments.push(comment);
+  res.status(201).json({ message: "comment added", description: comment });
+});
+
+router.delete("/:id/comments/:idComment", handleHotelById, (req, res) => {
+  checkIdComment = hotelById.comments.find((comment, index) => {
+    indexComment = index;
+    return comment.id.toString() === req.params.idComment.toString();
+  });
+  if (!checkIdComment) {
+    return res.status(400).json({
+      error: "error 400 bad request",
+      description: `${req.params.idComment} id comment does not exists`,
+    });
+  }
+  hotelById.comments.splice(indexComment, 1);
+  res.send(hotelById);
 });
 
 module.exports = router;

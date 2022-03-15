@@ -9,6 +9,7 @@ const postComment = require("./JoiConditions/postComment");
 
 let indexRestaurant =
   "this value correspond to the index of the restaurant selected";
+let indexComment = "this value correspond to the index of the comment selected";
 let restaurantById =
   "This value will change each time the user seach a restaurant by ID";
 //middleware who return the element which correspond to the params
@@ -141,5 +142,20 @@ router.post(
     res.status(201).json({ message: "comment added", description: comment });
   }
 );
+
+router.delete("/:id/comments/:idComment", handleRestaurantById, (req, res) => {
+  checkIdComment = restaurantById.comments.find((comment, index) => {
+    indexComment = index;
+    return comment.id.toString() === req.params.idComment.toString();
+  });
+  if (!checkIdComment) {
+    return res.status(400).json({
+      error: "error 400 bad request",
+      description: `${req.params.idComment} id comment does not exists`,
+    });
+  }
+  restaurantById.comments.splice(indexComment, 1);
+  res.send(restaurantById);
+});
 
 module.exports = router;
