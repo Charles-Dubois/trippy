@@ -5,22 +5,35 @@ const restaurantsRouter = require("./router/restaurantsRouter");
 const premiumRouter = require("./router/premiumRouter");
 const APIKey = require("./APIKey.json");
 const app = express();
-const rateLimiter = new RateLimiterMemory({
-  points: 100,
-  duration: 60, // per 30 seconds
-});
 app.use(express.json());
 
+const rateLimiter = new RateLimiterMemory({
+  points: 100,
+  duration: 60,
+});
+let loggedIn = false;
 function checkAPIKey(req, res, next) {
   let validation = "default value";
+  if (APIKey.length < 1 && req.query.api_key) {
+    return res.status(400).json({
+      error: "400 bad request",
+      description: "Any API are registered",
+    });
+  }
   if (req.query.api_key && APIKey.length > 0) {
     validation = APIKey.find((user) => user.api_key === req.query.api_key);
   }
   if (validation !== "default value") {
-    console.log("result : " + validation.api_key);
+    if (!validation) {
+      return res.status(400).json({
+        error: "400 bad request",
+        description: "this APi key is not valid",
+      });
+    }
+    console.log(validation.api_key);
   }
   // TODO continuer ici : faire en sorte que quand la clé api correspond a une clé déjà entrée le nombre de requete possbile augment
-  //TODO si la clé api n'est pas valable return un message d'arrêt
+
   next();
 }
 
