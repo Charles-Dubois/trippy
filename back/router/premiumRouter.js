@@ -16,6 +16,17 @@ function checkUsername(req, res, next) {
 }
 
 router.post("/", checkUsername, (req, res) => {
+  const checkUsers = data.find((user) => {
+    return (
+      user.username.toString().toLowerCase() ===
+      req.body.username.toString().toLowerCase()
+    );
+  });
+
+  if (checkUsers) {
+    return res.send(`the username ${checkUsers.username} already exists`);
+  }
+
   const userKey = { username: req.body.username, api_key: uuidv4() };
   data.push(userKey);
 
