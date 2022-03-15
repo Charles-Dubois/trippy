@@ -1,6 +1,7 @@
 const express = require("express");
 const hotelsRouter = require("./router/hotelsRouter");
 const restaurantsRouter = require("./router/restaurantsRouter");
+const premiumRouter = require("./router/premiumRouter");
 const { RateLimiterMemory } = require("rate-limiter-flexible");
 const app = express();
 const rateLimiter = new RateLimiterMemory({
@@ -26,7 +27,7 @@ const rateLimiterMiddleware = (_req, res, next) => {
 };
 app.use("/hotels", rateLimiterMiddleware, hotelsRouter);
 app.use("/restaurants", rateLimiterMiddleware, restaurantsRouter);
-
+app.use("/premium", rateLimiterMiddleware, premiumRouter);
 app.get("*", (_req, res) => {
   res.status(404).send("error 404");
 });
