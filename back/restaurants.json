@@ -7,7 +7,8 @@
     "country": "France",
     "stars": 4,
     "cuisine": "french",
-    "priceCategory": 3
+    "priceCategory": 3,
+    "comments": []
   },
   {
     "id": 2,
@@ -17,7 +18,8 @@
     "country": "US",
     "stars": 5,
     "cuisine": "burger",
-    "priceCategory": 1
+    "priceCategory": 1,
+    "comments": []
   },
   {
     "id": 3,
@@ -27,6 +29,7 @@
     "country": "Australia",
     "stars": 5,
     "cuisine": "vegan",
-    "priceCategory": 2
+    "priceCategory": 2,
+    "comments": []
   }
 ]

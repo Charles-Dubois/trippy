@@ -8,7 +8,8 @@
     "stars": 5,
     "hasSpa": true,
     "hasPool": true,
-    "priceCategory": 3
+    "priceCategory": 3,
+    "comments": []
   },
   {
     "id": 2,
@@ -19,7 +20,8 @@
     "stars": 4,
     "hasSpa": true,
     "hasPool": false,
-    "priceCategory": 3
+    "priceCategory": 3,
+    "comments": []
   },
   {
     "id": 3,
@@ -30,6 +32,7 @@
     "stars": 3,
     "hasSpa": false,
     "hasPool": true,
-    "priceCategory": 2
+    "priceCategory": 2,
+    "comments": []
   }
 ]

@@ -2,8 +2,10 @@ const data = require("../restaurants.json");
 const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
+const { v4: uuidv4 } = require("uuid");
 const patchName = require("./JoiConditions/patchName");
 const addRestaurant = require("./JoiConditions/addRestaurant");
+const postComment = require("./JoiConditions/postComment");
 
 let indexRestaurant =
   "this value correspond to the index of the restaurant selected";
@@ -39,6 +41,17 @@ function checkAddRestaurant(req, res, next) {
 // middleware method PATCH with checking Joi condition
 function checkPatchName(req, res, next) {
   const validation = patchName.validate(req.body);
+  if (validation.error) {
+    return res.status(400).json({
+      message: "error 400 bad request",
+      description: validation.error.details[0].message,
+    });
+  }
+  next();
+}
+
+function checkPostComment(req, res, next) {
+  const validation = postComment.validate(req.body);
   if (validation.error) {
     return res.status(400).json({
       message: "error 400 bad request",
@@ -104,4 +117,29 @@ router.delete("/:id", handleRestaurantById, (_req, res) => {
 
   res.json(data);
 });
+//*comments path
+
+router.get("/:id/comments/", handleRestaurantById, (_req, res) => {
+  const comments = restaurantById.comments;
+  if (comments.length < 1) {
+    return res.send("Any comments addeds");
+  }
+  res.json(comments);
+});
+router.post(
+  "/:id/comments/",
+  handleRestaurantById,
+  checkPostComment,
+  (req, res) => {
+    const comment = {
+      id: uuidv4(),
+      username: req.body.username,
+      text: req.body.text,
+    };
+
+    restaurantById.comments.push(comment);
+    res.status(201).json({ message: "comment added", description: comment });
+  }
+);
+
 module.exports = router;
