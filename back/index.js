@@ -40,7 +40,6 @@ function checkAPIKey(req, res, next) {
     }
     loggedIn = true;
   }
-
   next();
 }
 

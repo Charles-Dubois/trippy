@@ -1,4 +1,4 @@
-const data = require("../hotels.json");
+// const data = require("../hotels.json");
 const express = require("express");
 const Joi = require("joi");
 const { v4: uuidv4 } = require("uuid");
@@ -6,6 +6,13 @@ const addHotel = require("./JoiConditions/addHotel");
 const patchName = require("./JoiConditions/patchName");
 const postComment = require("./JoiConditions/postComment");
 const router = express.Router();
+const dotenv = require("dotenv");
+dotenv.config({
+  path: "./config.env",
+});
+const { Pool } = require("pg");
+const Postgres = new Pool({ ssl: { rejectUnauthorized: false } });
+//Routes
 
 let indexHotel = "this value correspond to the index of the hotel selected";
 let hotelById =
@@ -19,7 +26,7 @@ function handleHotelById(req, res, next) {
 
   if (!checkId) {
     return res.status(400).json({
-      error: "error400 bad request",
+      error: "error 400 bad request",
       description: `${req.params.id} id does not exists`,
     });
   }
@@ -59,62 +66,92 @@ function checkPostComment(req, res, next) {
   next();
 }
 
-router.get("/", (req, res) => {
-  let queryData = data;
-  const queryParams = [
-    "country",
-    "priceCategory",
-    "name",
-    "address",
-    "city",
-    "stars",
-    "hasSpa",
-    "hasPool",
-    "priceCategory",
-  ];
-  for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
-    let currentLoop = queryParams[queryLoop];
-    if (req.query[currentLoop]) {
-      queryData = queryData.filter(
-        (element) =>
-          element[currentLoop].toString().toLowerCase() ===
-          req.query[currentLoop].toString().toLowerCase()
-      );
-    }
+router.get("/", async (_req, res) => {
+  let hotels;
+  try {
+    hotels = await Postgres.query("SELECT * FROM hotels");
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: "Error",
+    });
   }
-  res.json(queryData);
+
+  res.json(hotels.rows);
 });
 
-router.get("/:id", handleHotelById, (req, res) => {
-  res.json(hotelById);
+router.get("/:id", async (req, res) => {
+  let hotel;
+  try {
+    hotel = await Postgres.query("SELECT * FROM hotels WHERE id = $1", [
+      req.params.id,
+    ]);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: "Error",
+    });
+  }
+
+  res.json(hotel.rows);
 });
 
-router.post("/", checkAddHotel, (req, res) => {
-  const addData = {
-    id: data[data.length - 1].id + 1,
-    name: req.body.name,
-    address: req.body.address,
-    city: req.body.city,
-    country: req.body.country,
-    hasSpa: req.body.hasSpa,
-    hasPool: req.body.hasPool,
-    stars: req.body.stars,
-    priceCategory: req.body.priceCategory,
-  };
+router.post("/", checkAddHotel, async (req, res) => {
+  const add = req.body;
+  try {
+    await Postgres.query(
+      "INSERT INTO hotels(name, address, city, country, stars, hasSpa, hasPool, priceCategory, comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8, ARRAY []::VARCHAR[]);",
+      [
+        add.name,
+        add.address,
+        add.city,
+        add.country,
+        add.stars,
+        add.hasSpa,
+        add.hasPool,
+        add.priceCategory,
+      ]
+    );
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: "Error",
+    });
+  }
+  const added = await Postgres.query("SELECT * FROM hotels WHERE name =$1", [
+    add.name,
+  ]);
 
-  data.push(addData);
+  res.json({
+    message: "Hotel added !",
+    description: added.rows,
+  });
+
   res.status(201).json({ message: "Hotel added", description: addData });
 });
 
-router.patch("/:id", handleHotelById, checkPatchName, (req, res) => {
-  hotelById.name = req.body.name;
-  res.json({ message: "name changed", description: hotelById });
+router.patch("/:id", checkPatchName, async (req, res) => {
+  try {
+    await Postgres.query("UPDATE hotels SET name = $1 WHERE id= $2", [
+      req.body.name,
+      req.params.id,
+    ]);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ message: "Error" });
+  }
+  res.send("Name changed");
 });
 
-router.delete("/:id", handleHotelById, (_req, res) => {
-  data.splice(indexHotel, 1);
-
-  res.json(data);
+// ================================================================================================ //
+router.delete("/:id", async (req, res) => {
+  try {
+    await Postgres.query("DELETE FROM hotels WHERE id = $1", [req.params.id]);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ message: "Error" });
+  }
+  res.send("restaurant removed!");
 });
 //*comments path
 
