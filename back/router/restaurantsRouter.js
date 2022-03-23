@@ -6,13 +6,13 @@ const { v4: uuidv4 } = require("uuid");
 const patchName = require("./JoiConditions/patchName");
 const addRestaurant = require("./JoiConditions/addRestaurant");
 const postComment = require("./JoiConditions/postComment");
-
+const Restaurant = require("../models/restaurantsModel");
 let indexRestaurant =
   "this value correspond to the index of the restaurant selected";
 let indexComment = "this value correspond to the index of the comment selected";
 let restaurantById =
   "This value will change each time the user seach a restaurant by ID";
-//middleware who return the element which correspond to the params
+//middleware which return the element which correspond to the params
 function handleRestaurantById(req, res, next) {
   checkId = data.find((restaurant, index) => {
     indexRestaurant = index;
@@ -91,20 +91,26 @@ router.get("/:id", handleRestaurantById, (_req, res) => {
   res.json({ restaurantById });
 });
 
-router.post("/", checkAddRestaurant, (req, res) => {
-  const addData = {
-    id: data[data.length - 1].id + 1,
-    name: req.body.name,
-    address: req.body.address,
-    city: req.body.city,
-    country: req.body.country,
-    cuisine: req.body.cuisine,
-    stars: req.body.stars,
-    priceCategory: req.body.priceCategory,
-  };
-
-  data.push(addData);
-  res.status(201).json({ message: "restaurant added", description: addData });
+router.post("/", checkAddRestaurant, async (req, res) => {
+  try {
+    await Restaurant.create(req.body);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
+  }
+  res.status(201).json({ message: "restaurant added", description: req.body });
+  // const addData = {
+  //   id: data[data.length - 1].id + 1,
+  //   name: req.body.name,
+  //   address: req.body.address,
+  //   city: req.body.city,
+  //   country: req.body.country,
+  //   cuisine: req.body.cuisine,
+  //   stars: req.body.stars,
+  //   priceCategory: req.body.priceCategory,
+  // };
+  // data.push(addData);
+  // res.status(201).json({ message: "restaurant added", description: addData });
 });
 
 router.patch("/:id", handleRestaurantById, checkPatchName, (req, res) => {

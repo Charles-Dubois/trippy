@@ -1,13 +1,21 @@
 const express = require("express");
 const { RateLimiterMemory } = require("rate-limiter-flexible");
+const mongoose = require("mongoose");
 const hotelsRouter = require("./router/hotelsRouter");
 const restaurantsRouter = require("./router/restaurantsRouter");
 const premiumRouter = require("./router/premiumRouter");
 const apiRouter = require("./router/apiKey");
 const APIKey = require("./APIKey.json");
-
+const mongoKey = require("./mongoKey");
 const app = express();
 app.use(express.json());
+
+mongoose
+  .connect(mongoKey, {
+    useNewUrlParser: true,
+  })
+  .then(() => console.log("mongo connection done !"))
+  .catch((err) => console.log(err));
 
 const rateLimiter = new RateLimiterMemory({
   points: 10,
