@@ -130,9 +130,22 @@ router.post("/", checkAddRestaurant, async (req, res) => {
   // res.status(201).json({ message: "restaurant added", description: addData });
 });
 
-router.patch("/:id", handleRestaurantById, checkPatchName, (req, res) => {
-  restaurantById.name = req.body.name;
-  res.json({ message: "name changed", description: restaurantById });
+router.patch("/:id", checkPatchName, async (req, res) => {
+  try {
+    await Restaurant.updateOne(
+      { id: req.params.id },
+      {
+        name: req.body.name,
+      }
+    ).select("name");
+  } catch (err) {
+    console.log(err);
+    console.log(req.body.name);
+    return res.status(400).send("error 400");
+  }
+  res.json({ message: "name changed !" });
+  // restaurantById.name = req.body.name;
+  // res.json({ message: "name changed", description: restaurantById });
 });
 router.delete("/:id", handleRestaurantById, (_req, res) => {
   data.splice(indexRestaurant, 1);
@@ -141,42 +154,71 @@ router.delete("/:id", handleRestaurantById, (_req, res) => {
 });
 //*comments path
 
-router.get("/:id/comments/", handleRestaurantById, (req, res) => {
-  const comments = restaurantById.comments;
-  let currentComments = [];
-  const limit = parseInt(req.query.limit);
-
-  if (limit) {
-    for (let i = limit - 1; i >= 0; i--) {
-      if (comments[i]) {
-        currentComments.push(comments[i]);
-      }
-    }
+router.get("/:id/comments/", async (req, res) => {
+  let comments;
+  try {
+    comments = await Restaurant.findById(req.params.id).select("comments");
+    comments = comments.comments;
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
   }
-  if (comments.length < 1) {
-    return res.send("Any comments addeds");
-  }
-  if (currentComments.length > 0) {
-    return res.json(currentComments);
-  }
-
   res.json(comments);
-});
-router.post(
-  "/:id/comments/",
-  handleRestaurantById,
-  checkPostComment,
-  (req, res) => {
-    const comment = {
-      id: uuidv4(),
-      username: req.body.username,
-      text: req.body.text,
-    };
+  // const comments = restaurantById.comments;
+  // let currentComments = [];
+  // const limit = parseInt(req.query.limit);
 
-    restaurantById.comments.push(comment);
-    res.status(201).json({ message: "comment added", description: comment });
+  // if (limit) {
+  //   for (let i = limit - 1; i >= 0; i--) {
+  //     if (comments[i]) {
+  //       currentComments.push(comments[i]);
+  //     }
+  //   }
+  // }
+  // if (comments.length < 1) {
+  //   return res.send("Any comments addeds");
+  // }
+  // if (currentComments.length > 0) {
+  //   return res.json(currentComments);
+  // }
+  // res.json(comments);
+});
+router.post("/:id/comments/", checkPostComment, async (req, res) => {
+  const TheNewComment = {
+    id: uuidv4(),
+    username: req.body.username,
+    text: req.body.text,
+  };
+
+  let comments;
+  try {
+    comments = await Restaurant.findById(req.params.id).select("comments");
+    comments = comments.comments;
+    comments.push(TheNewComment);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
   }
-);
+
+  try {
+    await Restaurant.updateOne(
+      { id: req.params.id },
+      {
+        comments: comments,
+      }
+    ).select("comments");
+  } catch (err) {
+    console.log(err);
+
+    return res.status(400).send("error 400");
+  }
+  res.json({ message: "comments added" });
+
+  //TODO continuer ici : chercher a créer une collection ou les commentaire seront ajouter, lorqu'on ajoute un commentaitre son id se rajoute au tableau commentaire dans la collection restaurant
+  // TODO et le text le username et l'id se stock dans la nouvelle collection
+  // restaurantById.comments.push(comment);
+  // res.status(201).json({ message: "comment added", description: comment });
+});
 
 router.delete("/:id/comments/:idComment", handleRestaurantById, (req, res) => {
   checkIdComment = restaurantById.comments.find((comment, index) => {
