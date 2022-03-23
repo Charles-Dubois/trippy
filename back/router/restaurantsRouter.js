@@ -62,33 +62,50 @@ function checkPostComment(req, res, next) {
   next();
 }
 
-router.get("/", (req, res) => {
-  let queryData = data;
+router.get("/", async (req, res) => {
+  let restaurants;
 
-  const queryParams = [
-    "country",
-    "priceCategory",
-    "name",
-    "address",
-    "city",
-    "stars",
-    "cuisine",
-    "priceCategory",
-  ];
-  for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
-    let currentLoop = queryParams[queryLoop];
-    if (req.query[currentLoop]) {
-      queryData = queryData.filter(
-        (element) =>
-          element[currentLoop].toString().toLowerCase() ===
-          req.query[currentLoop].toString().toLowerCase()
-      );
-    }
+  try {
+    restaurants = await Restaurant.find();
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
   }
-  res.json(queryData);
+  res.json(restaurants);
+  // let queryData = data;
+  // const queryParams = [
+  //   "country",
+  //   "priceCategory",
+  //   "name",
+  //   "address",
+  //   "city",
+  //   "stars",
+  //   "cuisine",
+  //   "priceCategory",
+  // ];
+  // for (let queryLoop = 0; queryLoop < queryParams.length; queryLoop++) {
+  //   let currentLoop = queryParams[queryLoop];
+  //   if (req.query[currentLoop]) {
+  //     queryData = queryData.filter(
+  //       (element) =>
+  //         element[currentLoop].toString().toLowerCase() ===
+  //         req.query[currentLoop].toString().toLowerCase()
+  //     );
+  //   }
+  // }
+  // res.json(queryData);
 });
-router.get("/:id", handleRestaurantById, (_req, res) => {
-  res.json({ restaurantById });
+router.get("/:id", async (req, res) => {
+  let restaurant;
+  try {
+    restaurant = await Restaurant.findById(req.params.id);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
+  }
+  res.json(restaurant);
+  //* exemple of id : 623b3c8669de9533bda1e1c5 , 623b3d667ba07ef88f748522
+  // res.json({ restaurantById });
 });
 
 router.post("/", checkAddRestaurant, async (req, res) => {
