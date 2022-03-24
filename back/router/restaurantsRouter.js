@@ -148,10 +148,17 @@ router.patch("/:id", checkPatchName, async (req, res) => {
   // restaurantById.name = req.body.name;
   // res.json({ message: "name changed", description: restaurantById });
 });
-router.delete("/:id", handleRestaurantById, (_req, res) => {
-  data.splice(indexRestaurant, 1);
+router.delete("/:id", async (req, res) => {
+  try {
+    await Restaurant.findOneAndDelete(req.params.id);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
+  }
+  res.send("Restaurant removed");
 
-  res.json(data);
+  // data.splice(indexRestaurant, 1);
+  // res.json(data);
 });
 //*comments path
 

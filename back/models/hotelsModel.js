@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const restaurantsShema = new mongoose.Schema({
+const hotelsShema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -27,10 +27,13 @@ const restaurantsShema = new mongoose.Schema({
     min: 1,
     max: 5,
   },
-  cuisine: {
-    type: String,
+  hasSpa: {
+    type: Boolean,
     required: true,
-    maxlegth: 100,
+  },
+  hasPool: {
+    type: Boolean,
+    required: true,
   },
   priceCategory: {
     type: Number,
@@ -39,5 +42,5 @@ const restaurantsShema = new mongoose.Schema({
   },
 });
 
-const Restaurant = mongoose.model("restaurants", restaurantsShema);
-module.exports = Restaurant;
+const Hotel = mongoose.model("hotels", hotelsShema);
+module.exports = Hotel;

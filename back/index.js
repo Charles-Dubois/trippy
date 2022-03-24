@@ -10,6 +10,8 @@ const mongoKey = require("./mongoKey");
 const app = express();
 app.use(express.json());
 
+//TODO Continuer ici en sockant les clé api dans la base de donnée
+
 mongoose
   .connect(mongoKey, {
     useNewUrlParser: true,
