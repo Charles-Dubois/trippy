@@ -7,6 +7,7 @@ const patchName = require("./JoiConditions/patchName");
 const addRestaurant = require("./JoiConditions/addRestaurant");
 const postComment = require("./JoiConditions/postComment");
 const Restaurant = require("../models/restaurantsModel");
+const CommentRestaurant = require("../models/commentsRestaurantsModel");
 let indexRestaurant =
   "this value correspond to the index of the restaurant selected";
 let indexComment = "this value correspond to the index of the comment selected";
@@ -157,8 +158,8 @@ router.delete("/:id", handleRestaurantById, (_req, res) => {
 router.get("/:id/comments/", async (req, res) => {
   let comments;
   try {
-    comments = await Restaurant.findById(req.params.id).select("comments");
-    comments = comments.comments;
+    comments = await CommentRestaurant.find(req.params);
+    comments = comments;
   } catch (err) {
     console.log(err);
     return res.status(400).send("error 400");
@@ -184,55 +185,56 @@ router.get("/:id/comments/", async (req, res) => {
   // res.json(comments);
 });
 router.post("/:id/comments/", checkPostComment, async (req, res) => {
-  const TheNewComment = {
-    id: uuidv4(),
-    username: req.body.username,
-    text: req.body.text,
-  };
-
-  let comments;
+  let theRestaurant;
   try {
-    comments = await Restaurant.findById(req.params.id).select("comments");
-    comments = comments.comments;
-    comments.push(TheNewComment);
+    theRestaurant = await Restaurant.findById(req.params.id);
   } catch (err) {
     console.log(err);
     return res.status(400).send("error 400");
   }
+  if (theRestaurant) {
+    const TheNewComment = {
+      idRestaurant: theRestaurant.id,
+      username: req.body.username,
+      text: req.body.text,
+    };
 
-  try {
-    await Restaurant.updateOne(
-      { id: req.params.id },
-      {
-        comments: comments,
-      }
-    ).select("comments");
-  } catch (err) {
-    console.log(err);
-
-    return res.status(400).send("error 400");
+    try {
+      await CommentRestaurant.create(TheNewComment);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).send("error 400");
+    }
+  } else {
+    return res.send("this id of restaurant does not exists");
   }
   res.json({ message: "comments added" });
 
-  //TODO continuer ici : chercher a créer une collection ou les commentaire seront ajouter, lorqu'on ajoute un commentaitre son id se rajoute au tableau commentaire dans la collection restaurant
-  // TODO et le text le username et l'id se stock dans la nouvelle collection
   // restaurantById.comments.push(comment);
   // res.status(201).json({ message: "comment added", description: comment });
 });
 
-router.delete("/:id/comments/:idComment", handleRestaurantById, (req, res) => {
-  checkIdComment = restaurantById.comments.find((comment, index) => {
-    indexComment = index;
-    return comment.id.toString() === req.params.idComment.toString();
-  });
-  if (!checkIdComment) {
-    return res.status(400).json({
-      error: "error 400 bad request",
-      description: `${req.params.idComment} id comment does not exists`,
-    });
+router.delete("/:id/comments/:idComment", async (req, res) => {
+  //* mongoDB
+  try {
+    await CommentRestaurant.findOneAndDelete(req.params.id);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("error 400");
   }
-  restaurantById.comments.splice(indexComment, 1);
-  res.send(restaurantById);
+  res.send("comment removed");
+  // checkIdComment = restaurantById.comments.find((comment, index) => {
+  //   indexComment = index;
+  //   return comment.id.toString() === req.params.idComment.toString();
+  // });
+  // if (!checkIdComment) {
+  //   return res.status(400).json({
+  //     error: "error 400 bad request",
+  //     description: `${req.params.idComment} id comment does not exists`,
+  //   });
+  // }
+  // restaurantById.comments.splice(indexComment, 1);
+  // res.send(restaurantById);
 });
 
 module.exports = router;
